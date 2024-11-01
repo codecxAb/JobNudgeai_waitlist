@@ -1,36 +1,62 @@
-import React, { useState } from 'react';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import React, { useState } from "react";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import toast, { Toaster } from "react-hot-toast";
+
+// Regex to allow only emails from gmail.com, icloud.com, and yahoo.com
+const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|icloud\.com|yahoo\.com)$/;
+
+// List of common disposable email domains
+const disposableDomains = [
+  "mailinator.com",
+  "10minutemail.com",
+  "tempmail.com",
+  "guerrillamail.com",
+  // Add more domains as needed
+];
 
 export function WaitlistForm() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const isDisposableEmail = (email: string) => {
+    const domain = email.split("@")[1];
+    return disposableDomains.includes(domain);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Email format validation
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    // Disposable email domain check
+    if (isDisposableEmail(email)) {
+      toast.error("Disposable email addresses are not allowed.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('waitlist')
-        .insert([{ email }]);
+      const { error } = await supabase.from("waitlist").insert([{ email }]);
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error('This email is already on the waitlist!');
+        if (error.code === "23505") {
+          toast.error("This email is already on the waitlist!");
         } else {
-          toast.error('Something went wrong. Please try again.');
+          toast.error("Something went wrong. Please try again.");
         }
         return;
       }
 
       setSubmitted(true);
-      setEmail('');
-      toast.success('Successfully joined the waitlist!');
+      setEmail("");
+      toast.success("Successfully joined the waitlist!");
     } catch (error) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +89,7 @@ export function WaitlistForm() {
                 Joining...
               </span>
             ) : (
-              'Join Waitlist'
+              "Join Waitlist"
             )}
           </button>
         </div>
