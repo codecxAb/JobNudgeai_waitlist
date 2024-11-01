@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(10px, -10px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.floating-icon {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-icon:nth-child(2n) {
+  animation-delay: 1s;
+  animation-duration: 8s;
+}
+
+.floating-icon:nth-child(3n) {
+  animation-delay: 2s;
+  animation-duration: 7s;
+}
+
+.animate-cursor {
+  transition: transform 0.2s;
+}
